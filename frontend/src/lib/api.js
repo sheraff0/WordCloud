@@ -32,14 +32,17 @@ export const fetchData = ({ dataSet, form, data, method="POST" }) => update =>
       update(state => ({ ...state, loading: false, error: response }))
       return
     }
-
     const jsonData = await response.json()
       .catch(err => new Error(err))
-
+    const { detail, message } = jsonData;
+  
     update(state => ({
       ...state, loading: false,
-      ...(data instanceof Error
+      ...(jsonData instanceof Error
         ? { error: jsonData }
-        : { data: jsonData, error: false })
+        : detail || message
+          ? { error: detail || message }
+          : { data: jsonData, error: false }
+      )
     }))
   })()

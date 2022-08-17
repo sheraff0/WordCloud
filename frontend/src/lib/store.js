@@ -4,6 +4,7 @@ import { fetchData } from "./api"
 const UPLOAD = "upload"
 
 // GENERIC DATASET
+
 class DataSet {
   constructor(dataSet) {
     this.dataSet = dataSet
