@@ -8,14 +8,16 @@ from fastapi.templating import Jinja2Templates
 
 from wcloud import WCMaker
 
+from settings import *
+
 
 app = FastAPI()
 
 # Static
-app.mount("/temp", StaticFiles(directory="temp"), name="temp")
-app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
+app.mount("/temp", StaticFiles(directory=f"{APP_DIR}temp"), name="temp")
+app.mount("/assets", StaticFiles(directory=f"{APP_DIR}frontend/dist/assets"), name="assets")
 
-templates = Jinja2Templates(directory="frontend/dist")
+templates = Jinja2Templates(directory=f"{APP_DIR}frontend/dist")
 
 
 @app.post("/upload")
@@ -38,4 +40,8 @@ async def upload_files(
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    static_host = STATIC_HOST
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "static_host": static_host
+    })

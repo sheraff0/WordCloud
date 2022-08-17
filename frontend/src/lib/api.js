@@ -1,4 +1,4 @@
-export const HOST = "http://127.0.0.1:8000/";
+export const HOST = document.getElementById("static-host").innerText
 
 const dataSetMap = dataSet => ({
   upload: {

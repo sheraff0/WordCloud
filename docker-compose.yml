@@ -1,0 +1,33 @@
+version: '3'
+
+volumes:
+  production_caddy_2: {}
+  production_caddy_data: {}
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./compose/api/Dockerfile
+    image: wordcloud_production_api
+    platform: linux/x86_64
+    env_file:
+      - ./compose/.env
+    command: /start
+
+  caddy:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./compose/caddy/Dockerfile
+    image: wordcloud_production_caddy_2
+    depends_on:
+      - api
+    volumes:
+      - production_caddy_2:/root/.caddy
+      - production_caddy_data:/data
+    env_file:
+      - ./compose/.env
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"

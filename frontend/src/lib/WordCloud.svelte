@@ -11,5 +11,5 @@
 {/if}
 
 {#if wcloud}
-  <img src={HOST}{wcloud} alt="Word cloud">
+  <img src={HOST}/{wcloud} alt="Word cloud">
 {/if}

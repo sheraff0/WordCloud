@@ -15,6 +15,7 @@ from fastapi.responses import (
     Response, StreamingResponse, JSONResponse)
 from wordcloud import WordCloud
 
+from settings import *
 from stopwords import STOPWORDS
 
 JSON, STREAM = "json", "stream"
@@ -37,9 +38,10 @@ class ResponseMixin:
         return f"{name}_{timestamp}.{ext}"
 
     def set_output_path(self):
-        p = Path(".")
+        p = Path(APP_DIR)
         self.filename = self.get_filename()
-        self.output_path = p / "temp" / self.filename
+        self.output_url = Path("temp") / self.filename
+        self.output_path = p / self.output_url
 
     def set_output_buffer(self):
         self.output_buffer = {
@@ -60,7 +62,7 @@ class ResponseMixin:
     def get_json_response(self) -> Response:
         return JSONResponse({
             "stopwords": self._stopwords,
-            "wcloud": str(self.output_path),
+            "wcloud": str(self.output_url),
             "counter": self._counter
         })
 
