@@ -12,7 +12,7 @@ services:
     image: wordcloud_production_api
     platform: linux/x86_64
     env_file:
-      - ./compose/.env
+      - ./.env
     command: /start
 
   caddy:
@@ -27,7 +27,7 @@ services:
       - production_caddy_2:/root/.caddy
       - production_caddy_data:/data
     env_file:
-      - ./compose/.env
+      - ./.env
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"

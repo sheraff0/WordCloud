@@ -8,7 +8,7 @@ RUN addgroup --system api \
     && adduser --system --ingroup api api
 
 COPY --chown=api:api ./*.py /app
-COPY --chown=api:api ./.env .env
+COPY --chown=api:api ./.env .env.local
 COPY --chown=api:api ./frontend/dist /app/frontend/dist
 
 COPY --chown=api:api ./compose/api/start /start
