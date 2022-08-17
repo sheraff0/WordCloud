@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 RUN addgroup --system api \
     && adduser --system --ingroup api api
 
-COPY --chown=api:api ./*.py /app
+COPY --chown=api:api -r wcloud /app/wcloud
 COPY --chown=api:api ./.env .env.local
 COPY --chown=api:api ./frontend/dist /app/frontend/dist
 

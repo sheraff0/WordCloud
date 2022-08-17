@@ -17,7 +17,7 @@ Used libraries
 Installation
 -
 ### Local
-- run project in a dedicated python environment, with pre-installed packages listed in requirements.txt:
+- run project in a dedicated python environment, with pre-installed packages listed in `requirements.txt`:
 `python bot.py`
 
 ### Production

@@ -6,9 +6,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from wcloud import WCMaker
-
-from settings import *
+from .wcloud import WCMaker
+from .settings import *
 
 
 app = FastAPI()
@@ -40,8 +39,7 @@ async def upload_files(
 
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
-    static_host = STATIC_HOST
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "static_host": static_host
+        "static_host": STATIC_HOST
     })

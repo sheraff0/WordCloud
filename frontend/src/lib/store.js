@@ -35,8 +35,8 @@ class Upload extends DataSet {
   }
 
   extractData() {
-    const { data={} } = this.getData()
-    const { counter=[], stopwords=[] } = data
+    const { data } = this.getData()
+    const { counter=[], stopwords=[] } = data || {}
     this.update(state => ({ ...state, counter, stopwords }))
   }
 

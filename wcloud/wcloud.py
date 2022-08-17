@@ -15,8 +15,8 @@ from fastapi.responses import (
     Response, StreamingResponse, JSONResponse)
 from wordcloud import WordCloud
 
-from settings import *
-from stopwords import STOPWORDS
+from .settings import *
+from .stopwords import STOPWORDS
 
 JSON, STREAM = "json", "stream"
 MIN_WORDS_COLLECTION = 10

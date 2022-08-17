@@ -19,13 +19,14 @@
 <style>
   .stop-words {
     color: #888;
+    padding: 1em 2em;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
   }
   .stop-word:hover {
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.03rem;
     color: rgb(166, 155, 91);
   }
   span {
