@@ -1,3 +1,6 @@
+from wordcloud import STOPWORDS as STOPWORDS_EN
+
+
 STOPWORDS = {
     "ru": [
         "и", "в", "на", "с", "из", "от", "о", "во", "за", "по",
@@ -10,7 +13,5 @@ STOPWORDS = {
         "мне", "его", "ее", "нам", "вам",
         "все"
     ],
-    "en": [
-
-    ]
+    "en": list(STOPWORDS_EN)
 }

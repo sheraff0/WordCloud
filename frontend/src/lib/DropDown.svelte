@@ -8,7 +8,6 @@
   export let name="lang"
   const options = OPTIONS[name]
   export let value=options[0][0]
-  $: console.log(value)
 </script>
 
 <input {name} {value} hidden>

@@ -112,7 +112,7 @@ class TextProcessMixin:
 
     def clear_non_alpfa(self):
         self._text = re.sub(
-            r'[\n\d\/\W]', ' ', self._text)
+            r'[\n\d\/\W\_]', ' ', self._text)
 
     def deflate(self):
         self._text = re.sub(
