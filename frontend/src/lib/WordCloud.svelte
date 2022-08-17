@@ -1,0 +1,15 @@
+<script>
+  import { HOST } from './api'
+  import { upload } from './store'
+  $: loading = $upload.loading
+  $: data = ($upload.data || {})
+  $: wcloud = data.wcloud
+</script>
+
+{#if loading}
+  <p>Loading...</p>
+{/if}
+
+{#if wcloud}
+  <img src={HOST}{wcloud} alt="Word cloud">
+{/if}
