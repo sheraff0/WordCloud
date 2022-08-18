@@ -6,7 +6,7 @@
 
 <main>
   <div>
-    <p>Upload text file (TXT or XML, incl. HTML)</p>
+    <p>Upload text file (TXT, XML (incl. HTML), PDF)</p>
   </div>
   <h1>Word Cloud</h1>
 

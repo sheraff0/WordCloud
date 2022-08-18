@@ -4,9 +4,12 @@ import re
 import json
 from datetime import datetime
 from pathlib import Path
+from collections import Counter
+
 import PIL
 from bs4 import BeautifulSoup
-from collections import Counter
+from PyPDF2 import PdfReader
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -19,8 +22,11 @@ from .settings import *
 from .stopwords import STOPWORDS
 
 JSON, STREAM = "json", "stream"
+
+MIN_XML_TEXT_RATIO = 0.3
 MIN_WORDS_COLLECTION = 10
 MOST_COMMON_NUMBER = 100
+MAX_WORD_LENGTH = 22
 
 
 @dataclass
@@ -89,22 +95,35 @@ class TextProcessMixin:
         if (not self._stopwords) and self.lang:
             self._stopwords = STOPWORDS.get(self.lang, [])
 
-    def unify_text(self):
-        self._text = self.text.decode("utf-8").lower()
+    async def read_file(self):
+        self.text = await self.text_file.read()
 
-    def make_soup(self):
-        MIN_RATIO = 0.3
+    def parse_xml(self):
+        self._text = self.text.decode("utf-8").lower()
+        soup = ""
         try:
             soup = BeautifulSoup(self._text, 'xml')
             soup = soup.text
-            if len(soup) / len(self.text) >= MIN_RATIO:
-                self._text = soup
         except Exception as e:
             print(e)
+        if len(soup) / len(self.text) >= MIN_XML_TEXT_RATIO:
+            self._text = soup
+
+    def parse_pdf(self):
+        self.reader = PdfReader(BytesIO(self.text))
+        self._text = "".join([
+            page.extract_text()
+            for page in self.reader.pages
+        ]).lower()
+
+    def parse(self):
+        if self.text_file.filename.endswith(".pdf"):
+            self.parse_pdf()
+        else:
+            self.parse_xml()
 
     def remove_long_strings(self):
         # clean potential binary objects
-        MAX_WORD_LENGTH = 22
         length = str(MAX_WORD_LENGTH + 1)
         pattern = re.compile(
             '\S{' + length + ',}')
@@ -119,9 +138,8 @@ class TextProcessMixin:
             r'\s+', ' ', self._text)
 
     def extract_text(self):
-        self.unify_text()
         self.set_stopwords()
-        self.make_soup()
+        self.parse()
         self.remove_long_strings()
         self.clear_non_alpfa()
         self.deflate()
@@ -138,7 +156,7 @@ class TextProcessMixin:
 
     async def prepare_text(self):
         try:
-            self.text = await self.text_file.read()
+            await self.read_file()
             self.extract_text()
             self.set_words_collection()
             self.clear_stopwords()
@@ -183,7 +201,7 @@ class WCMaker(
     def generate_cloud(self):
         self.wc.generate(self._text)
 
-    def plot_cloud(self, destination="wcloud.png"):
+    def plot_cloud(self, destination):
         plt.figure()
         plt.imshow(self.wc, interpolation="bilinear")
         # plt.figure()
