@@ -21,6 +21,7 @@ from wordcloud import WordCloud
 
 from .settings import *
 from .stopwords import STOPWORDS
+from .utils import read_by_chunks
 
 JSON, STREAM = "json", "stream"
 
@@ -131,7 +132,7 @@ class TextProcessMixin:
             self._stopwords = STOPWORDS.get(self.lang, [])
 
     async def read_file(self):
-        self.text = await self.text_file.read()
+        self.text = await read_by_chunks(self.text_file)
 
     def parse_xml(self):
         self._text = self.text.decode("utf-8").lower()
@@ -205,7 +206,7 @@ class TextProcessMixin:
 class ImageProcessMixin:
     """For future development: use `input_mask`
     """
-    image_file: UploadFile
+    image_file: BytesIO
 
     def get_image_mask(self, file):
         return np.array(
