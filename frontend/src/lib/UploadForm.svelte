@@ -14,7 +14,6 @@
     e.preventDefault()
     await checkHash.loadData({ data: { hash }})
     const textParsed = checkHash.textParsed
-    console.log(textParsed)
     await upload.loadAndCheck({ form, textParsed })
   }
   $: stopwordsStr = JSON.stringify($upload.stopwords) || "[]"

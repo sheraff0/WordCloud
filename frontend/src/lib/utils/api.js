@@ -13,9 +13,11 @@ const getRequestOptions = ({ form, data }) => {
   let body
   if (form) {
     body = new FormData(form)
+    console.log("Sending form")
     return { body }
   } else if (data) {
     body = JSON.stringify(data)
+    console.log("Sending JSON")
     return {
       body,
       headers: { 'Content-Type': 'application/json' }

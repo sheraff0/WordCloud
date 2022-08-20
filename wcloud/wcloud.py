@@ -34,7 +34,8 @@ MAX_WORD_LENGTH = 22
 
 class TextIndex:
     def __init__(self, hash: str, text: Union[str, None]):
-        self.path = Path(TEXT_INDEX_ROOT) / hash
+        p = Path(APP_DIR)
+        self.path = p / TEXT_INDEX_ROOT / hash
         self.text = text
 
     def exists(self):
