@@ -9,5 +9,8 @@ __pycache__/
 static/
 media/
 temp/
+text_index/
 
 # .env
+
+sqlite.db

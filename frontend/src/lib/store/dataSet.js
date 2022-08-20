@@ -1,29 +1,20 @@
-import { writable } from "svelte/store"
-import { fetchData } from "./api"
+import { CustomWritable } from './base'
+import { fetchData } from "../utils/api"
 
-const UPLOAD = "upload"
+const UPLOAD = "upload", CHECK_HASH = "checkHash"
 
 // GENERIC DATASET
 
-class DataSet {
+class DataSet extends CustomWritable {
   constructor(dataSet) {
-    this.dataSet = dataSet
-    const { subscribe, set, update } = writable({ loading: false, data: null })
-    this.subscribe = subscribe; this.set = set; this.update = update
-  }
-
-  reset() {
-    this.set({ loading: false, data: null })
+    super({
+      default: { loading: false, data: null },
+      dataSet
+    })
   }
 
   async loadData({ ...options } = {}) {
     await fetchData({ dataSet: this.dataSet, ...options })(this.update)
-  }
-
-  getData() {
-    let result
-    this.subscribe(state => result = state)()
-    return result
   }
 }
 
@@ -32,6 +23,7 @@ class DataSet {
 class Upload extends DataSet {
   constructor() {
     super(UPLOAD)
+    this.TEXT_FILE = "text_file"
   }
 
   extractData() {
@@ -53,8 +45,15 @@ class Upload extends DataSet {
     this.update(state => ({ ...state, counterChecked }))
   }
 
-  async loadAndCheck({ ...options }) {
-    await this.loadData({ ...options })
+  async loadAndCheck({ form, textParsed }) {
+    if (textParsed) {
+      const formData = new FormData(form)
+      formData.delete(this.TEXT_FILE)
+      const data = Object.fromEntries(formData.entries())
+      await this.loadData({ data })
+    } else {
+      await this.loadData({ form })
+    }
     this.extractData()
     this.checkCounter()
   }
@@ -79,4 +78,24 @@ class Upload extends DataSet {
   }
 }
 
+// CHECK HASH
+
+class CheckHash extends DataSet {
+  constructor() {
+    super(CHECK_HASH)
+  }
+
+  extractData() {
+    const { data } = this.getData()
+    const { textParsed } = data || {}
+    this.textParsed = textParsed
+  }
+
+  async loadAndCheck({ ...options }) {
+    await this.loadData({ ... options })
+    this.extractData()
+  }
+}
+
 export const upload = new Upload()
+export const checkHash = new CheckHash()

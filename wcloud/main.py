@@ -1,3 +1,4 @@
+from typing import Union
 from fastapi import (
     FastAPI, Request,
     File, Form, UploadFile
@@ -6,8 +7,10 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from .wcloud import WCMaker
+from pydantic import BaseModel
+
 from .settings import *
+from .wcloud import WCMaker, TextIndex
 
 
 app = FastAPI()
@@ -19,22 +22,36 @@ app.mount("/assets", StaticFiles(directory=f"{APP_DIR}frontend/dist/assets"), na
 templates = Jinja2Templates(directory=f"{APP_DIR}frontend/dist")
 
 
-@app.post("/upload")
+# Views 
+@app.post("/upload/")
 async def upload_files(
-    text_file: UploadFile = File(description="Source text for word cloud"),
+    text_file: Union[UploadFile, None] = File(description="Source text for word cloud"),
+    hash: str = Form(),
     lang: str = Form(),
     stopwords: str = Form(),
     # image_file: UploadFile = File(description="Image mask for word cloud"),
 ):
     wc = WCMaker(
         text_file=text_file,
-        #image_file=images_file,
+        hash=hash,
         lang=lang,
         stopwords=stopwords,
         response_type="json"
     )
     await wc()
     return wc.output
+
+
+class HashItem(BaseModel):
+    hash: str
+
+
+@app.post("/check-hash/")
+async def check_hash(item: HashItem):
+    exists = TextIndex(item.hash, None).exists()
+    return {
+        "textParsed": exists,
+    }
 
 
 @app.get("/", response_class=HTMLResponse)

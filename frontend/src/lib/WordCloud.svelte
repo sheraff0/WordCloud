@@ -1,5 +1,5 @@
 <script>
-  import { HOST } from './api'
+  import { HOST } from './utils/api'
   import { upload } from './store'
   $: loading = $upload.loading
   $: data = ($upload.data || {})
@@ -8,7 +8,7 @@
 </script>
 
 {#if loading}
-  <p>Loading...</p>
+  <p class="loading ">Loading...</p>
 {/if}
 
 {#if error}
@@ -18,3 +18,9 @@
 {#if wcloud}
   <img src={HOST}/{wcloud} alt="Word cloud">
 {/if}
+
+<style>
+  .loading {
+    color: green;
+  }
+</style>

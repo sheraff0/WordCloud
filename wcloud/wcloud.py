@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Union
 from io import BytesIO
 import re
 import json
@@ -23,10 +24,32 @@ from .stopwords import STOPWORDS
 
 JSON, STREAM = "json", "stream"
 
+TEXT_INDEX_ROOT = "text_index"
+
 MIN_XML_TEXT_RATIO = 0.3
 MIN_WORDS_COLLECTION = 10
 MOST_COMMON_NUMBER = 100
 MAX_WORD_LENGTH = 22
+
+
+class TextIndex:
+    def __init__(self, hash: str, text: Union[str, None]):
+        self.path = Path(TEXT_INDEX_ROOT) / hash
+        self.text = text
+
+    def exists(self):
+        return self.path.exists()
+
+    def read(self):
+        if self.exists():
+            with open(self.path,'r') as f:
+                self.text = f.read()
+                return self.text
+
+    def save(self):
+        if self.text:
+            with open(self.path, 'w') as f:
+                f.write(self.text)
 
 
 @dataclass
@@ -84,11 +107,20 @@ class ResponseMixin:
 
 @dataclass
 class TextProcessMixin:
-    text_file: UploadFile
+    text_file: Union[UploadFile, None]
+    hash: str
     stopwords: str = "[]"
     lang: str = None
     _text: str = None
     _words: list[str] = field(default_factory=lambda: [])
+
+    def read_clean_text(self):
+        if _text := TextIndex(self.hash, None).read():
+            self._text = _text
+            return self._text
+
+    def save_clean_text(self):
+        TextIndex(self.hash, self._text).save()
 
     def set_stopwords(self):
         self._stopwords = json.loads(self.stopwords)
@@ -137,12 +169,12 @@ class TextProcessMixin:
         self._text = re.sub(
             r'\s+', ' ', self._text)
 
-    def extract_text(self):
-        self.set_stopwords()
+    def clean_text(self):
         self.parse()
         self.remove_long_strings()
         self.clear_non_alpfa()
         self.deflate()
+        self.save_clean_text()
 
     def set_words_collection(self):
         self._words = self._text.split(' ')
@@ -155,13 +187,12 @@ class TextProcessMixin:
             self._text = re.sub(pattern, ' ', self._text)
 
     async def prepare_text(self):
-        try:
+        self.set_stopwords()
+        if not self.read_clean_text():
             await self.read_file()
-            self.extract_text()
-            self.set_words_collection()
-            self.clear_stopwords()
-        except Exception as e:
-            print(e)
+            self.clean_text()
+        self.set_words_collection()
+        self.clear_stopwords()
 
 @dataclass
 class ImageProcessMixin:

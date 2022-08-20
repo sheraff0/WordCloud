@@ -2,7 +2,10 @@ export const HOST = document.getElementById("static-host").innerText
 
 const dataSetMap = dataSet => ({
   upload: {
-    url: "/upload"
+    url: "/upload/"
+  },
+  checkHash: {
+    url: "/check-hash/"
   }
 })[dataSet]
 
