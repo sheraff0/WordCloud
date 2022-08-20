@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Union
+from typing import Union, List
 from io import BytesIO
 import re
 import json
@@ -111,12 +111,13 @@ class TextProcessMixin:
     text_file: Union[UploadFile, None]
     hash: str
     stopwords: str = "[]"
-    lang: str = None
+    lang: Union[str, None] = None
     _text: str = None
-    _words: list[str] = field(default_factory=lambda: [])
+    _words: List[str] = field(default_factory=lambda: [])
 
     def read_clean_text(self):
         if _text := TextIndex(self.hash, None).read():
+            print("Read from INDEX")
             self._text = _text
             return self._text
 
@@ -125,7 +126,8 @@ class TextProcessMixin:
 
     def set_stopwords(self):
         self._stopwords = json.loads(self.stopwords)
-        if (not self._stopwords) and self.lang:
+        if (self._stopwords is None) and self.lang:
+            print(f"{self.lang} - default STOPWORDS")
             self._stopwords = STOPWORDS.get(self.lang, [])
 
     async def read_file(self):
@@ -176,6 +178,7 @@ class TextProcessMixin:
         self.clear_non_alpfa()
         self.deflate()
         self.save_clean_text()
+        print("PARSED")
 
     def set_words_collection(self):
         self._words = self._text.split(' ')
@@ -189,11 +192,14 @@ class TextProcessMixin:
 
     async def prepare_text(self):
         self.set_stopwords()
-        if not self.read_clean_text():
-            await self.read_file()
-            self.clean_text()
-        self.set_words_collection()
-        self.clear_stopwords()
+        try:
+            if not self.read_clean_text():
+                await self.read_file()
+                self.clean_text()
+            self.set_words_collection()
+            self.clear_stopwords()
+        except Exception as e:
+            print(e)
 
 @dataclass
 class ImageProcessMixin:

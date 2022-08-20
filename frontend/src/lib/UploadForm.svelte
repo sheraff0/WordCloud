@@ -12,15 +12,19 @@
 // Handlers
   const handleSubmit = async e => {
     e.preventDefault()
-    await checkHash.loadData({ data: { hash }})
-    const textParsed = checkHash.textParsed
+    await checkHash.loadAndCheck({ data: { hash }})
+    const textParsed = $checkHash.textParsed
     await upload.loadAndCheck({ form, textParsed })
   }
-  $: stopwordsStr = JSON.stringify($upload.stopwords) || "[]"
+  const handleChange = e => {
+    upload.resetWcloud()
+    upload.reset()
+  }
+  $: stopwordsStr = JSON.stringify($upload.stopwords || null)
 </script>
 
 <form action="" enctype="multipart/form-data" bind:this={form}>
-  <input name={TEXT_FILE} use:hashFile bind:this={file} type="file">
+  <input name={TEXT_FILE} use:hashFile bind:this={file} on:change={handleChange} type="file">
   <input name="hash" bind:value={hash} type="text" hidden>
   <span class="hashing" hidden={!hashing}>Hashing...</span>
   <DropDown name="lang"/>

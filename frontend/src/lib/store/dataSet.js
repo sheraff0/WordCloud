@@ -27,30 +27,34 @@ class Upload extends DataSet {
   }
 
   extractData() {
-    const { data } = this.getData()
-    const { counter=[], stopwords=[] } = data || {}
-    this.update(state => ({ ...state, counter, stopwords }))
+    this.update(state => {
+      const { data } = state
+      const { counter=[], stopwords=[], wcloud=null } = data || {}
+      return { ...state, counter, stopwords, wcloud }
+    })
   }
 
   checkCounter() {
-    const { counter=[], stopwords=[] } = this.getData()
-    const maxCount = Math.max(...counter.map(x => x[1]))
-    const counterChecked = counter.map(x => {
-      return ({
-        active: stopwords.indexOf(x[0]) > -1,
-        text: x[0],
-        size: Math.round(x[1] / maxCount * 100) / 100
+    this.update(state => {
+      const { counter=[], stopwords=[] } = state
+      const maxCount = Math.max(...counter.map(x => x[1]))
+      const counterChecked = counter.map(x => {
+        return ({
+          active: (stopwords || []).indexOf(x[0]) > -1,
+          text: x[0],
+          size: Math.round(x[1] / maxCount * 100) / 100
+        })
       })
+      return { ...state, counterChecked }
     })
-    this.update(state => ({ ...state, counterChecked }))
   }
 
   async loadAndCheck({ form, textParsed }) {
     if (textParsed) {
-      const formData = new FormData(form)
-      formData.delete(this.TEXT_FILE)
-      const data = Object.fromEntries(formData.entries())
-      await this.loadData({ data })
+      const clone = form.cloneNode(true)
+      const textField = clone.querySelector(`[name="${this.TEXT_FILE}"]`)
+      textField.value = null
+      await this.loadData({ form: clone })
     } else {
       await this.loadData({ form })
     }
@@ -59,22 +63,33 @@ class Upload extends DataSet {
   }
 
   updateStopwords(text, func) {
-    let { stopwords=[] } = this.getData()
-    stopwords = func(stopwords, text)
-    this.update(state => ({ ...state, stopwords }))
+    this.update(state => {
+      let { stopwords=[] } = state
+      stopwords = func(stopwords, text)
+      return { ...state, stopwords }
+    })
     this.checkCounter()
   }
 
   addStopword(text) {
     this.updateStopwords(text, (stopwords, text) =>
-      [...new Set([...stopwords, text])]
+      [...new Set([...(stopwords || []), text])]
     )
   }
 
   removeStopword(text) {
     this.updateStopwords(text, (stopwords, text) =>
-      [...stopwords.filter(x => x !== text)]
+      [...(stopwords || []).filter(x => x !== text)]
     )
+  }
+
+  resetStopwords(nullify=true) {
+    this.updateStopwords("", (stopwords, text) =>
+      nullify ? null: [])
+  }
+
+  resetWcloud() {
+    this.update(state => ({ ...state, wcloud: null }))
   }
 }
 
@@ -88,7 +103,7 @@ class CheckHash extends DataSet {
   extractData() {
     const { data } = this.getData()
     const { textParsed } = data || {}
-    this.textParsed = textParsed
+    this.update(state => ({ ...state, textParsed }))
   }
 
   async loadAndCheck({ ...options }) {

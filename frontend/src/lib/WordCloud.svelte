@@ -2,8 +2,7 @@
   import { HOST } from './utils/api'
   import { upload } from './store'
   $: loading = $upload.loading
-  $: data = ($upload.data || {})
-  $: wcloud = data.wcloud
+  $: wcloud = $upload.wcloud
   $: error = $upload.error
 </script>
 
