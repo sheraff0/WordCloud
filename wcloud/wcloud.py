@@ -21,7 +21,6 @@ from wordcloud import WordCloud
 
 from .settings import *
 from .stopwords import STOPWORDS
-from .utils import read_by_chunks
 
 JSON, STREAM = "json", "stream"
 
@@ -132,7 +131,7 @@ class TextProcessMixin:
             self._stopwords = STOPWORDS.get(self.lang, [])
 
     async def read_file(self):
-        self.text = await read_by_chunks(self.text_file)
+        self.text = await self.text_file.read()
 
     def parse_xml(self):
         self._text = self.text.decode("utf-8").lower()
