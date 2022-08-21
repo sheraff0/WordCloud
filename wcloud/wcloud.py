@@ -33,7 +33,7 @@ MAX_WORD_LENGTH = 22
 
 
 class TextIndex:
-    def __init__(self, hash: str, text: Union[str, None]):
+    def __init__(self, hash: str, text: str=""):
         p = Path(APP_DIR)
         self.path = p / TEXT_INDEX_ROOT / hash
         self.text = text
@@ -74,6 +74,7 @@ class ResponseMixin:
         self.output_path = p / self.output_url
 
     def set_output_buffer(self):
+        self.set_output_path()
         self.output_buffer = {
             JSON: self.output_path,
             STREAM: BytesIO()
@@ -115,13 +116,13 @@ class TextProcessMixin:
     _text: str = None
     _words: List[str] = field(default_factory=lambda: [])
 
-    def read_clean_text(self):
+    def read_cleaned_text(self):
         if _text := TextIndex(self.hash, None).read():
             print("Read from INDEX")
             self._text = _text
             return self._text
 
-    def save_clean_text(self):
+    def save_cleaned_text(self):
         TextIndex(self.hash, self._text).save()
 
     def set_stopwords(self):
@@ -170,14 +171,14 @@ class TextProcessMixin:
 
     def deflate(self):
         self._text = re.sub(
-            r'\s+', ' ', self._text)
+            r'\s{2,}', ' ', self._text)
 
     def clean_text(self):
         self.parse()
         self.remove_long_strings()
         self.clear_non_alpfa()
         self.deflate()
-        self.save_clean_text()
+        self.save_cleaned_text()
         print("PARSED")
 
     def set_words_collection(self):
@@ -193,7 +194,7 @@ class TextProcessMixin:
     async def prepare_text(self):
         self.set_stopwords()
         try:
-            if not self.read_clean_text():
+            if not self.read_cleaned_text():
                 await self.read_file()
                 self.clean_text()
             self.set_words_collection()
@@ -248,7 +249,6 @@ class WCMaker(
         plt.savefig(destination)
 
     def plot_cloud_to_buffer(self):
-        self.set_output_path()
         self.set_output_buffer()
         self.plot_cloud(self.output_buffer)
 
