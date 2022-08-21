@@ -32,6 +32,7 @@ export const fetchData = ({ dataSet, form, data, method="POST" }) => update =>
       .catch(err => new Error(err))
 
     if (response instanceof Error) {
+      print(response)
       update(state => ({ ...state, loading: false, error: response }))
       return
     }

@@ -2,6 +2,9 @@
     reverse_proxy api:5000 {
         header_down -X-Frame-Options
     }
+    request_body {
+        max_size {$MAX_UPLOAD_SIZE}
+    }
     header {
         -Server
         X-XSS-Protection "1; mode=block"
