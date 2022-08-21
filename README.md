@@ -28,11 +28,10 @@ Installation
 `STATIC_HOST=<your_domain>`
 
 ### Frontend
-- source code and components are located in `frontend/src`
-- to re-build frontend for FastAPI server, run:
+- built frontend files (`.html, .css, .js`) are located and served from `frontend/dist` folder
+- source code (`.js`) and components (`.svelte`) are located in `frontend/src/lib` folder
+- to re-build frontend (e.g. after `src` modificaion), run:
 
 `npm install`
 
 `npm run build`
-
-Buid frontend files will be served from `frontend/dist` folder.

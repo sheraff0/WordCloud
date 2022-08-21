@@ -85,7 +85,7 @@ class Upload extends DataSet {
 
   resetStopwords(nullify=true) {
     this.updateStopwords("", (stopwords, text) =>
-      nullify ? null: [])
+      nullify ? null : [])
   }
 
   resetWcloud() {
@@ -101,9 +101,11 @@ class CheckHash extends DataSet {
   }
 
   extractData() {
-    const { data } = this.getData()
-    const { textParsed } = data || {}
-    this.update(state => ({ ...state, textParsed }))
+    this.update(state => {
+      const { data } = state
+      const { textParsed } = data || {}
+      return { ...state, textParsed }
+    })
   }
 
   async loadAndCheck({ ...options }) {
