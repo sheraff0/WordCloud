@@ -14,12 +14,12 @@ from PyPDF2 import PdfReader
 import matplotlib.pyplot as plt
 import numpy as np
 
-from fastapi import File, UploadFile
+from fastapi import UploadFile
 from fastapi.responses import (
     Response, StreamingResponse, JSONResponse)
 from wordcloud import WordCloud
 
-from .settings import *
+from wcloud import settings
 from .stopwords import STOPWORDS
 
 JSON, STREAM = "json", "stream"
@@ -33,8 +33,8 @@ MAX_WORD_LENGTH = 22
 
 
 class TextIndex:
-    def __init__(self, hash: str, text: str=""):
-        p = Path(APP_DIR)
+    def __init__(self, hash: str, text: str = ""):
+        p = Path(settings.APP_DIR)
         self.path = p / TEXT_INDEX_ROOT / hash
         self.text = text
 
@@ -43,7 +43,7 @@ class TextIndex:
 
     def read(self):
         if self.exists():
-            with open(self.path,'r') as f:
+            with open(self.path, 'r') as f:
                 self.text = f.read()
                 return self.text
 
@@ -68,7 +68,7 @@ class ResponseMixin:
         return f"{name}_{timestamp}.{ext}"
 
     def set_output_path(self):
-        p = Path(APP_DIR)
+        p = Path(settings.APP_DIR)
         self.filename = self.get_filename()
         self.output_url = Path("temp") / self.filename
         self.output_path = p / self.output_url
@@ -201,6 +201,7 @@ class TextProcessMixin:
             self.clear_stopwords()
         except Exception as e:
             print(e)
+
 
 @dataclass
 class ImageProcessMixin:

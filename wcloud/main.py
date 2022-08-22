@@ -9,23 +9,27 @@ from fastapi.templating import Jinja2Templates
 
 from pydantic import BaseModel
 
-from .settings import *
-from .wcloud import WCMaker, TextIndex
+from wcloud import settings as _
+from wcloud.factory import WCMaker, TextIndex
 
 
 app = FastAPI()
 
 # Static
-app.mount("/temp", StaticFiles(directory=f"{APP_DIR}temp"), name="temp")
-app.mount("/assets", StaticFiles(directory=f"{APP_DIR}frontend/dist/assets"), name="assets")
+app.mount(f"/{_.CACHE_DIR}", StaticFiles(
+    directory=f"{_.APP_DIR}{_.CACHE_DIR}"), name=_.CACHE_DIR)
+app.mount("/assets", StaticFiles(
+    directory=f"{_.APP_DIR}frontend/dist/assets"), name="assets")
 
-templates = Jinja2Templates(directory=f"{APP_DIR}frontend/dist")
+templates = Jinja2Templates(
+    directory=f"{_.APP_DIR}frontend/dist")
 
 
-# Views 
+# Views
 @app.post("/upload/")
 async def upload_files(
-    text_file: Union[UploadFile, None] = File(description="Source text for word cloud"),
+    text_file: Union[UploadFile, None] = File(
+        description="Source text for word cloud"),
     hash: str = Form(),
     lang: str = Form(),
     stopwords: str = Form(),
@@ -58,5 +62,5 @@ async def check_hash(item: HashItem):
 async def main(request: Request):
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "static_host": STATIC_HOST
+        "static_host": _.STATIC_HOST
     })
