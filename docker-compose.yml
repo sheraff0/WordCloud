@@ -12,6 +12,7 @@ services:
     image: wordcloud_production_api
     platform: linux/x86_64
     volumes:
+      - ./app:/app
       - ./temp:/temp
       - ./frontend/dist:/dist
     env_file:
