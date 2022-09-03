@@ -1,13 +1,13 @@
 from pathlib import Path
 from datetime import datetime
 
-from wcloud import settings as _
-
+FILES_ROOT = "/temp"
+BASE_URL = "temp"
 TEXT_INDEX_ROOT = "text_index"
 
 
 class FileResource:
-    root = Path(_.APP_DIR)
+    root = Path(FILES_ROOT)
     path: Path = None
     data: str | bytes = None
     bytes: str = ""  # "b" if bytes
@@ -33,9 +33,13 @@ class FileResource:
 class TextIndex(FileResource):
     def __init__(self, hash: str, text: str = ""):
         self.path = self.root / TEXT_INDEX_ROOT / hash
+        self.data = text
 
 
 class FileServeCache(FileResource):
+    filename: str
+    url: str
+    path: Path
     filename_base: str = "file.ext"
 
     def __init__(self):
@@ -53,10 +57,10 @@ class FileServeCache(FileResource):
         self.filename = f"{name}_{timestamp}.{ext}"
 
     def set_url(self):
-        self.url = Path(_.CACHE_DIR) / self.filename
+        self.url = Path(BASE_URL) / self.filename
 
     def set_path(self):
-        self.path = self.root / self.url
+        self.path = self.root / self.filename
 
     def set(self):
         self.set_filename()

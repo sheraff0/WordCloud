@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./compose/api/Dockerfile
+    image: wordcloud_production_api
+    platform: linux/x86_64
+    ports:
+      - 8000:5000
+    env_file:
+      - ./.env.local
+    volumes:
+      - ./app:/app
+      - ./temp:/temp
+      - ./frontend/dist:/dist

@@ -1,14 +1,15 @@
+from typing import Any, Dict
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
 
 class Plotter:
-    wc_base_params: dict = field(default_factory=lambda: dict(
+    wc_base_params: Dict = dict(
         background_color="white",
         max_words=2000,
         contour_width=3,
         contour_color="steelblue"
-    ))
+    )
 
     def set_wcloud(self):
         self.wc = WordCloud(**dict(
@@ -28,6 +29,5 @@ class Plotter:
         plt.axis("off")
         plt.savefig(destination)
 
-    def plot_cloud_to_buffer(self):
-        self.set_output_buffer()
-        self.plot_cloud(self.output_buffer)
+    def plot_cloud_to_buffer(self, buffer: Any):
+        self.plot_cloud(buffer)

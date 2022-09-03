@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Union, List
 from io import BytesIO
 import re
 import json
@@ -19,7 +18,7 @@ from fastapi.responses import (
     Response, StreamingResponse, JSONResponse)
 from wordcloud import WordCloud
 
-from wcloud import settings
+import settings
 from .stopwords import STOPWORDS
 
 JSON, STREAM = "json", "stream"
@@ -109,12 +108,12 @@ class ResponseMixin:
 
 @dataclass
 class TextProcessMixin:
-    text_file: Union[UploadFile, None]
+    text_file: UploadFile | None
     hash: str
     stopwords: str = "[]"
-    lang: Union[str, None] = None
+    lang: str | None
     _text: str = None
-    _words: List[str] = field(default_factory=lambda: [])
+    _words: list[str] = field(default_factory=lambda: [])
 
     def read_cleaned_text(self):
         if _text := TextIndex(self.hash, None).read():

@@ -11,9 +11,11 @@ services:
       dockerfile: ./compose/api/Dockerfile
     image: wordcloud_production_api
     platform: linux/x86_64
+    volumes:
+      - ./temp:/temp
+      - ./frontend/dist:/dist
     env_file:
       - ./.env
-    command: /start
 
   caddy:
     restart: always
